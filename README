@@ -1,0 +1,5 @@
+Setup macOS
+-----------
+
+An Ansible bootstrap and playbook script to set up a macOS profile for Sherman
+to use and never have to setup a mac from scratch again. Hopefully

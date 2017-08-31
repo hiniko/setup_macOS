@@ -1,0 +1,155 @@
+---
+- hosts: localhost
+  vars:
+    tools:
+      - ffmpeg
+      - git 
+      - gpg
+      - iftop
+      - mtr
+      - neovim
+      - pwgen
+      - tmux
+      - watch
+      - zsh
+      - aspell
+      - htop
+      - ncdu
+      - redis
+      - sqlite
+      - tree 
+      - youtube-dl
+    apps:
+      - 1password
+      - alfred
+      - dash
+      - discord
+      - docker
+      - dropbox
+      - google-chrome
+      - macdown
+      - monodraw
+      - mysqlworkbench
+      - ngrok
+      - selfcontrol
+      - slack
+      - spotify
+      - the-unarchiver
+      - tripmode
+      - vlc
+      - whatsapp
+    dotfiles_path: "~/.dotfiles"
+    skip_macOS_system_config: "{{ dotfiles_path }}/.skip_macOS_system_config"
+    home_folder: "/Users/sherman"
+
+  roles:
+    - { role: rvm1-ansible,
+        rvm1_user: 'sherman',
+        rvm1_rvm_version: 'stable',
+        rvm1_rubies: ['ruby-2.3.3'] }
+
+  tasks:
+
+
+############################################################
+#   Prefilight checks 
+############################################################
+
+    - name: Create hidden home folder for personal config files later on
+      file:
+        path: "{{ dotfiles_path }}"
+        state: directory
+        mode: 0775
+
+############################################################
+#   System Setup
+############################################################
+
+    - name: Check if system config has already happened
+      stat:
+        path: "{{ skip_macOS_system_config }}"
+      register: system_configured
+
+    - name: Run macOS system confiuration script
+      script: "configure_macOS_settings.sh"
+      when: not system_configured.stat.exists
+
+    - name: Create file to show system configuration step has heppened before
+      copy:
+        content: ""
+        dest: "{{ skip_macOS_system_config }}"
+        force: no
+
+############################################################
+#   Tool and Application Setup
+############################################################
+
+    - name: Check if Homebrew is already installed
+      stat:
+        path: /usr/local/bin/brew
+      register: homebrew
+
+    - name: Install Homebrew
+      script: install-homebrew.sh
+      when: not homebrew.stat.exists
+
+    - name: Install cli packages through brew
+      homebrew: 
+        name: "{{ item }}" 
+        state: present
+        update_homebrew: yes
+      with_items: 
+        - "{{ tools }}"
+
+    - name: Install Cask apps through brew 
+      homebrew_cask:
+        name: "{{ item }}"
+        state: present
+        update_homebrew: yes
+      with_items:
+        - "{{ apps }}"
+
+    - name: Check if Oh My zsh
+      stat:
+        path: "~/.oh-my-zsh" 
+      register: ohmyzsh 
+
+    - name: Install Oh My Zsh
+      shell: "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
+      when: ohmyzsh.stat.exists
+
+############################################################
+#    Personal Dotfiles and Configuraitons 
+############################################################
+
+    - name: change shell to zsh
+      user:
+        name: sherman
+        shell: "/bin/zsh"
+        ssh_key_bits: "4096"
+        ssh_key_file: ".ssh/id_rsa"
+      become: root
+
+    - name: Grab dotfiles from github
+      git:
+        repo: https://github.com/hiniko/dotfiles.git
+        dest: "{{ dotfiles_path }}/configs"
+
+    - name: Link dotfile configurations
+      shell: "{{ dotfiles_path }}/configs/link.sh"
+
+    - name: Create vim autoload dir
+      file:
+        path: "{{ home_folder }}/.vim/autoload"
+        state: directory
+        mode: 0775
+
+    - name: Download vim plug for plugins
+      get_url:
+        url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        dest: "{{ home_folder }}/.vim/autoload/plug.vim"
+
+    - name: Download Afterglow Terminal theme
+      get_url:
+        url: https://raw.githubusercontent.com/lysyi3m/osx-terminal-themes/master/schemes/Afterglow.terminal
+        dest: "{{ home_folder }}/Afterglow.terminal"

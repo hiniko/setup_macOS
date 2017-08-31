@@ -1,0 +1,4 @@
+---
+# Install rvm1-ansible
+- name: rvm1-ansible
+  src: https://github.com/rvm/rvm1-ansible
