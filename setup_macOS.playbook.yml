@@ -19,6 +19,7 @@
       - sqlite
       - tree 
       - youtube-dl
+      - nodejs
     apps:
       - 1password
       - alfred
