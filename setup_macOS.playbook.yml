@@ -79,6 +79,7 @@
         content: ""
         dest: "{{ skip_macOS_system_config }}"
         force: no
+      when: not system_configured.stat.exists   
 
 ############################################################
 #   Tool and Application Setup
@@ -109,19 +110,20 @@
       with_items:
         - "{{ apps }}"
 
-    - name: Check if Oh My zsh
+    - name: Check if Oh My zsh has been installed
       stat:
         path: "~/.oh-my-zsh" 
       register: ohmyzsh 
 
     - name: Install Oh My Zsh
       shell: "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
-      when: ohmyzsh.stat.exists
+      when: not ohmyzsh.stat.exists
 
 ############################################################
 #    Personal Dotfiles and Configuraitons 
 ############################################################
 
+    # TODO: Check if user will overwrite the existing ssh key
     - name: change shell to zsh
       user:
         name: sherman
@@ -148,9 +150,7 @@
         - backups
         - swaps
 
-
-
-    - name: Download vim plug for plugins
+    - name: Download vim-plug for vim plugins
       get_url:
         url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         dest: "{{ home_folder }}/.vim/autoload/plug.vim"
