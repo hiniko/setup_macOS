@@ -21,7 +21,7 @@ Sit back and relax as your system comes together
 
 ## Customisation
 
-There are two places you may want to edit to customise the settings that are put in place. Also there is a call to a remote git repo that contains dotfiles. My repo has a script that does the linking of the configuration files to their proper place. If you would rather not do this, remove the tasks from the Ansible Playbook. My dotfiles repo and the `link.sh` script can be found (here)[https://github.com/hiniko/dotfiles]
+There are two places you may want to edit to customise the settings that are put in place. Also there is a call to a remote git repo that contains dotfiles. My repo has a script that does the linking of the configuration files to their proper place. If you would rather not do this, remove the tasks from the Ansible Playbook. My dotfiles repo and the `link.sh` script can be found [here](https://github.com/hiniko/dotfiles)
 
 The first is in `files/configure_macOS_settings.sh` This contains all of the `defaults` commands that are used to configure macOS.
 
