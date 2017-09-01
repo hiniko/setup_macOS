@@ -138,11 +138,17 @@
     - name: Link dotfile configurations
       shell: "{{ dotfiles_path }}/configs/link.sh"
 
-    - name: Create vim autoload dir
+    - name: Create vim directories 
       file:
-        path: "{{ home_folder }}/.vim/autoload"
+        path: "{{ home_folder }}/.vim/{{ item }}"
         state: directory
         mode: 0775
+      with_items:
+        - autoload
+        - backups
+        - swaps
+
+
 
     - name: Download vim plug for plugins
       get_url:
