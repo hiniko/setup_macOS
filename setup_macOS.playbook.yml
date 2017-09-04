@@ -19,13 +19,15 @@
       - sqlite
       - tree 
       - youtube-dl
+      - docker
       - nodejs
+      - yarn
+      - nmap
     apps:
       - 1password
       - alfred
       - dash
       - discord
-      - docker
       - dropbox
       - google-chrome
       - macdown
