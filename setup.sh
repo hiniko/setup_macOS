@@ -18,6 +18,9 @@ run() {
 	
 }
 
+# Check OS type (Linux vs MacOS)
+SYSTEM="$(uname)"
+
 # Check if Ansible has been installed and install if not
 if [[ -z "$(check ansible)"  ]]; then 
 	echo "Ansible not found, installing now"
@@ -31,6 +34,14 @@ fi
 # Install modules for ansible
 echo Installing Ansible Modules
 ansible-galaxy install -r requirements.yml
+
 # Run the Ansible Playbook
-echo Running ansible playbook
-ansible-playbook -i "localhost," -c local setup_macOS.playbook.yml
+
+if [[ "$SYSTEM" == "Darwin" ]]; then 
+	echo Running ansible playbook for macOS 
+	ansible-playbook -i "localhost," -c local setup_macOS.playbook.yml
+else 
+	echo Running ansible playbook for Linux 
+	ansible-playbook -i "localhost," -c local setup_linux.playbook.yml
+
+fi
